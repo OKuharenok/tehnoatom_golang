@@ -11,7 +11,7 @@ import (
 
 var (
 	BotToken   = "804024125:AAGmGaOBur6phuvFC-xoCMkFptqtPIrGAiQ"
-	WebhookURL = "https://525f2cb5.ngrok.io"
+	WebhookURL = "https://git.heroku.com/nwtaskbot.git"
 )
 
 type Task struct {
