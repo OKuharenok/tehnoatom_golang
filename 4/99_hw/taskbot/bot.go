@@ -11,7 +11,7 @@ import (
 
 var (
 	BotToken   = "804024125:AAGmGaOBur6phuvFC-xoCMkFptqtPIrGAiQ"
-	WebhookURL = "https://git.heroku.com/nwtaskbot.git"
+	WebhookURL = "https://525f2cb5.ngrok.io"
 )
 
 type Task struct {
@@ -135,13 +135,14 @@ func startTaskBot(ctx context.Context) error {
 					} else {
 						msg = tgbotapi.NewMessage(Users[TaskPool[id].Assignee], reply)
 					}
+					bot.Send(msg)
 				}
 				var t Task
 				t.Assignee = UserName
 				t.Author = TaskPool[id].Author
 				t.Name = TaskPool[id].Name
 				TaskPool[id] = t
-				bot.Send(msg)
+
 			case "/unassign":
 				id, _ := strconv.Atoi(com[1])
 				reply := ""
@@ -166,23 +167,29 @@ func startTaskBot(ctx context.Context) error {
 				}
 			case "/resolve":
 				id, _ := strconv.Atoi(com[1])
-				reply := `Задача "` + TaskPool[id].Name + `" выполнена`
-				msg := tgbotapi.NewMessage(ChatID, reply)
-				bot.Send(msg)
-				reply = `Задача "` + TaskPool[id].Name + `" выполнена @` + TaskPool[id].Assignee
-				msg = tgbotapi.NewMessage(Users[TaskPool[id].Author], reply)
-				bot.Send(msg)
-				delete(TaskPool, id)
+				if _, isExists := TaskPool[id]; isExists {
+					if TaskPool[id].Assignee == UserName {
+						reply := `Задача "` + TaskPool[id].Name + `" выполнена`
+						msg := tgbotapi.NewMessage(ChatID, reply)
+						bot.Send(msg)
+						if TaskPool[id].Author != UserName {
+							reply = `Задача "` + TaskPool[id].Name + `" выполнена @` + TaskPool[id].Assignee
+							msg = tgbotapi.NewMessage(Users[TaskPool[id].Author], reply)
+							bot.Send(msg)
+						}
+						delete(TaskPool, id)
+					}
+				}
 			}
 		}
 	}
 	return nil
 }
 
-
+/*
 func main() {
 	err := startTaskBot(context.Background())
 	if err != nil {
 		panic(err)
 	}
-}
+}*/
